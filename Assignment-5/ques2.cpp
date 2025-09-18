@@ -1,83 +1,58 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include <iostream>
+using namespace std;
 
-typedef struct Node {
-    int data;
-    struct Node *next;
-} Node;
-
+struct Node { int data; Node* next; };
 Node* head = NULL;
 
-Node* createNode(int val) {
-    Node *p = (Node*)malloc(sizeof(Node));
-    p->data = val;
+void insertEnd(int x) {
+    Node* p = new Node;
+    p->data = x;
     p->next = NULL;
-    return p;
-}
-
-void insertAtEnd(int val) {
-    Node *p = createNode(val);
-    if (!head) { head = p; return; }
-    Node *cur = head;
-    while (cur->next) cur = cur->next;
-    cur->next = p;
-}
-
-void displayList() {
-    Node *cur = head;
-    if (!cur) { printf("Empty\n"); return; }
-    while (cur) {
-        printf("%d", cur->data);
-        if (cur->next) printf("->");
-        cur = cur->next;
+    if (!head) head = p;
+    else {
+        Node* t = head;
+        while (t->next) t = t->next;
+        t->next = p;
     }
-    printf("\n");
 }
 
 int deleteOccurrences(int key) {
     int count = 0;
     while (head && head->data == key) {
-        Node *temp = head;
+        Node* t = head;
         head = head->next;
-        free(temp);
+        delete t;
         count++;
     }
-    Node *cur = head, *prev = NULL;
-    while (cur) {
-        if (cur->data == key) {
-            Node *temp = cur;
-            prev->next = cur->next;
-            cur = cur->next;
-            free(temp);
+    Node* cur = head;
+    while (cur && cur->next) {
+        if (cur->next->data == key) {
+            Node* t = cur->next;
+            cur->next = cur->next->next;
+            delete t;
             count++;
-        } else {
-            prev = cur;
-            cur = cur->next;
-        }
+        } else cur = cur->next;
     }
     return count;
 }
 
+void display() {
+    Node* t = head;
+    if (!t) { cout << "Empty\n"; return; }
+    while (t) { cout << t->data << " "; t = t->next; }
+    cout << "\n";
+}
+
 int main() {
-    int n, val, key;
-    printf("Enter number of elements: ");
-    scanf("%d", &n);
-    printf("Enter elements:\n");
-    for (int i=0; i<n; i++) {
-        scanf("%d", &val);
-        insertAtEnd(val);
+    int ch, x, key;
+    while (1) {
+        cout << "1.InsertEnd 2.Display 3.DeleteOccurrences 4.Exit\n";
+        cin >> ch;
+        switch (ch) {
+            case 1: cin >> x; insertEnd(x); break;
+            case 2: display(); break;
+            case 3: cin >> key; cout << "Count: " << deleteOccurrences(key) << "\n"; break;
+            case 4: return 0;
+        }
     }
-    printf("Enter key: ");
-    scanf("%d", &key);
-
-    printf("Original List: ");
-    displayList();
-
-    int count = deleteOccurrences(key);
-    printf("Count: %d\n", count);
-
-    printf("Updated List: ");
-    displayList();
-
-    return 0;
 }
