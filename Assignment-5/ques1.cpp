@@ -1,151 +1,82 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include <iostream>
+using namespace std;
 
-typedef struct Node {
-    int data;
-    struct Node *next;
-} Node;
-
+struct Node { int data; Node* next; };
 Node* head = NULL;
 
-Node* createNode(int val) {
-    Node *p = (Node*)malloc(sizeof(Node));
-    if (!p) { printf("Memory error\n"); exit(1); }
-    p->data = val;
-    p->next = NULL;
-    return p;
-}
-
-void insertAtBeginning(int val) {
-    Node *p = createNode(val);
+void insertBeg(int x) {
+    Node* p = new Node;
+    p->data = x;
     p->next = head;
     head = p;
-    printf("%d inserted at beginning\n", val);
 }
 
-void insertAtEnd(int val) {
-    Node *p = createNode(val);
-    if (!head) { head = p; printf("%d inserted at end\n", val); return; }
-    Node *cur = head;
-    while (cur->next) cur = cur->next;
-    cur->next = p;
-    printf("%d inserted at end\n", val);
+void insertEnd(int x) {
+    Node* p = new Node;
+    p->data = x;
+    p->next = NULL;
+    if (!head) head = p;
+    else {
+        Node* t = head;
+        while (t->next) t = t->next;
+        t->next = p;
+    }
 }
 
-void insertBefore(int target, int val) {
-    if (!head) { printf("List is empty\n"); return; }
-    if (head->data == target) { insertAtBeginning(val); return; }
-    Node *prev = NULL, *cur = head;
-    while (cur && cur->data != target) { prev = cur; cur = cur->next; }
-    if (!cur) { printf("Target %d not found\n", target); return; }
-    Node *p = createNode(val);
-    prev->next = p;
-    p->next = cur;
-    printf("%d inserted before %d\n", val, target);
-}
-
-void insertAfter(int target, int val) {
-    Node *cur = head;
-    while (cur && cur->data != target) cur = cur->next;
-    if (!cur) { printf("Target %d not found\n", target); return; }
-    Node *p = createNode(val);
-    p->next = cur->next;
-    cur->next = p;
-    printf("%d inserted after %d\n", val, target);
-}
-
-void deleteFromBeginning() {
-    if (!head) { printf("List is empty\n"); return; }
-    Node *p = head;
+void deleteBeg() {
+    if (!head) return;
+    Node* t = head;
     head = head->next;
-    printf("%d deleted from beginning\n", p->data);
-    free(p);
+    delete t;
 }
 
-void deleteFromEnd() {
-    if (!head) { printf("List is empty\n"); return; }
-    if (!head->next) { printf("%d deleted from end\n", head->data); free(head); head = NULL; return; }
-    Node *prev = NULL, *cur = head;
-    while (cur->next) { prev = cur; cur = cur->next; }
-    prev->next = NULL;
-    printf("%d deleted from end\n", cur->data);
-    free(cur);
+void deleteEnd() {
+    if (!head) return;
+    if (!head->next) { delete head; head = NULL; return; }
+    Node* t = head;
+    while (t->next->next) t = t->next;
+    delete t->next;
+    t->next = NULL;
 }
 
-void deleteNode(int target) {
-    if (!head) { printf("List is empty\n"); return; }
-    if (head->data == target) { Node *p = head; head = head->next; printf("%d deleted\n", p->data); free(p); return; }
-    Node *prev = NULL, *cur = head;
-    while (cur && cur->data != target) { prev = cur; cur = cur->next; }
-    if (!cur) { printf("Node %d not found\n", target); return; }
-    prev->next = cur->next;
-    printf("%d deleted\n", cur->data);
-    free(cur);
+void deleteNode(int key) {
+    if (!head) return;
+    if (head->data == key) { Node* t = head; head = head->next; delete t; return; }
+    Node* t = head;
+    while (t->next && t->next->data != key) t = t->next;
+    if (t->next) { Node* d = t->next; t->next = d->next; delete d; }
 }
 
-void searchNode(int target) {
-    Node *cur = head;
+void searchNode(int key) {
+    Node* t = head;
     int pos = 1;
-    while (cur) {
-        if (cur->data == target) { printf("Node %d found at position %d\n", target, pos); return; }
-        cur = cur->next; pos++;
+    while (t) {
+        if (t->data == key) { cout << pos << "\n"; return; }
+        t = t->next; pos++;
     }
-    printf("Node %d not found\n", target);
+    cout << -1 << "\n";
 }
 
-void displayList() {
-    if (!head) { printf("List is empty\n"); return; }
-    Node *cur = head;
-    while (cur) {
-        printf("%d ", cur->data);
-        cur = cur->next;
-    }
-    printf("\n");
+void display() {
+    Node* t = head;
+    while (t) { cout << t->data << " "; t = t->next; }
+    cout << "\n";
 }
 
 int main() {
-    int choice, val, target, mode;
+    int ch, x, key;
     while (1) {
-        printf("\n1.Insert at beginning\n2.Insert at end\n3.Insert before/after a node\n4.Delete from beginning\n5.Delete from end\n6.Delete a specific node\n7.Search a node\n8.Display\n9.Exit\nEnter choice: ");
-        if (scanf("%d", &choice)!=1) return 0;
-        switch (choice) {
-            case 1:
-                printf("Enter value: "); scanf("%d", &val);
-                insertAtBeginning(val);
-                break;
-            case 2:
-                printf("Enter value: "); scanf("%d", &val);
-                insertAtEnd(val);
-                break;
-            case 3:
-                printf("Enter target value: "); scanf("%d", &target);
-                printf("Enter 1 to insert before, 2 to insert after: "); scanf("%d", &mode);
-                if (mode!=1 && mode!=2) { printf("Invalid mode\n"); break; }
-                printf("Enter value to insert: "); scanf("%d", &val);
-                if (mode==1) insertBefore(target, val); else insertAfter(target, val);
-                break;
-            case 4:
-                deleteFromBeginning();
-                break;
-            case 5:
-                deleteFromEnd();
-                break;
-            case 6:
-                printf("Enter value to delete: "); scanf("%d", &target);
-                deleteNode(target);
-                break;
-            case 7:
-                printf("Enter value to search: "); scanf("%d", &target);
-                searchNode(target);
-                break;
-            case 8:
-                displayList();
-                break;
-            case 9:
-                return 0;
-            default:
-                printf("Invalid choice\n");
+        cout << "1.InsertBeg 2.InsertEnd 3.DeleteBeg 4.DeleteEnd 5.DeleteNode 6.Search 7.Display 8.Exit\n";
+        cin >> ch;
+        switch (ch) {
+            case 1: cin >> x; insertBeg(x); break;
+            case 2: cin >> x; insertEnd(x); break;
+            case 3: deleteBeg(); break;
+            case 4: deleteEnd(); break;
+            case 5: cin >> key; deleteNode(key); break;
+            case 6: cin >> key; searchNode(key); break;
+            case 7: display(); break;
+            case 8: return 0;
         }
     }
-    return 0;
 }
