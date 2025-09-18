@@ -1,62 +1,49 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include <iostream>
+using namespace std;
 
-typedef struct Node {
-    int data;
-    struct Node *next;
-} Node;
-
+struct Node { int data; Node* next; };
 Node* head = NULL;
 
-Node* createNode(int val) {
-    Node *p = (Node*)malloc(sizeof(Node));
-    p->data = val;
+void insertEnd(int x) {
+    Node* p = new Node;
+    p->data = x;
     p->next = NULL;
-    return p;
-}
-
-void insertAtEnd(int val) {
-    Node *p = createNode(val);
-    if (!head) { head = p; return; }
-    Node *cur = head;
-    while (cur->next) cur = cur->next;
-    cur->next = p;
-}
-
-void displayList() {
-    Node *cur = head;
-    while (cur) {
-        printf("%d", cur->data);
-        if (cur->next) printf("->");
-        cur = cur->next;
+    if (!head) head = p;
+    else {
+        Node* t = head;
+        while (t->next) t = t->next;
+        t->next = p;
     }
-    printf("\n");
+}
+
+void display() {
+    Node* t = head;
+    if (!t) { cout << "Empty\n"; return; }
+    while (t) { cout << t->data << " "; t = t->next; }
+    cout << "\n";
 }
 
 void findMiddle() {
-    if (!head) { printf("List is empty\n"); return; }
-    Node *slow = head, *fast = head;
+    if (!head) { cout << "List is empty\n"; return; }
+    Node* slow = head;
+    Node* fast = head;
     while (fast && fast->next) {
         slow = slow->next;
         fast = fast->next->next;
     }
-    printf("Middle: %d\n", slow->data);
+    cout << "Middle: " << slow->data << "\n";
 }
 
 int main() {
-    int n, val;
-    printf("Enter number of elements: ");
-    scanf("%d", &n);
-    printf("Enter elements:\n");
-    for (int i=0; i<n; i++) {
-        scanf("%d", &val);
-        insertAtEnd(val);
+    int ch, x;
+    while (1) {
+        cout << "1.InsertEnd 2.Display 3.FindMiddle 4.Exit\n";
+        cin >> ch;
+        switch (ch) {
+            case 1: cin >> x; insertEnd(x); break;
+            case 2: display(); break;
+            case 3: findMiddle(); break;
+            case 4: return 0;
+        }
     }
-
-    printf("Linked List: ");
-    displayList();
-
-    findMiddle();
-
-    return 0;
 }
