@@ -1,50 +1,35 @@
-#include <stdio.h>
-#include <stdlib.h>
-#define MAX 100
+#include <iostream>
+#include <queue>
+using namespace std;
 
-int q[MAX];
-int front=0, rear=0;
+queue<int> q;
 
-int isEmpty() { return front==rear; }
-int size() { return rear - front; }
-void enqueue(int x) { q[rear++]=x; }
-int dequeue() { return q[front++]; }
-int qfront() { return q[front]; }
-
-void push_one(int x) {
-    enqueue(x);
-    int s = size();
-    for (int i=0;i<s-1;i++) enqueue(dequeue());
+void push(int x) {
+    q.push(x);
+    for (int i = 0; i < (int)q.size() - 1; i++) {
+        q.push(q.front());
+        q.pop();
+    }
 }
 
-void pop_one() {
-    if (isEmpty()) { printf("Stack Underflow\n"); return; }
-    printf("%d popped\n", dequeue());
+void pop() {
+    if (q.empty()) cout << "Empty\n";
+    else { cout << q.front() << " popped\n"; q.pop(); }
 }
 
-void peek_one() {
-    if (isEmpty()) { printf("Stack is Empty\n"); return; }
-    printf("Top: %d\n", qfront());
-}
-
-void display_one() {
-    if (isEmpty()) { printf("Stack is Empty\n"); return; }
-    for (int i=front;i<rear;i++) printf("%d ", q[i]);
-    printf("\n");
+void top() {
+    if (q.empty()) cout << "Empty\n";
+    else cout << q.front() << "\n";
 }
 
 int main() {
-    int choice, val;
+    int ch, x;
     while (1) {
-        printf("\n1.Push 2.Pop 3.Peek 4.Display 5.Exit\n");
-        if (scanf("%d", &choice)!=1) return 0;
-        switch (choice) {
-            case 1: scanf("%d", &val); push_one(val); break;
-            case 2: pop_one(); break;
-            case 3: peek_one(); break;
-            case 4: display_one(); break;
-            case 5: return 0;
-            default: printf("Invalid choice\n");
-        }
+        cout << "1.Push 2.Pop 3.Top 4.Exit\n";
+        cin >> ch;
+        if (ch == 1) { cin >> x; push(x); }
+        else if (ch == 2) pop();
+        else if (ch == 3) top();
+        else if (ch == 4) break;
     }
 }
