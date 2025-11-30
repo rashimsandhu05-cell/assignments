@@ -1,119 +1,73 @@
 #include <iostream>
 using namespace std;
 
-struct N{int d;N*next,*prev;};
-N *HD=0,*HC=0;
-
-void IF(int x){
-    N*t=new N{x,HD,0};
-    if(HD)HD->prev=t;
-    HD=t;
-}
-void IL(int x){
-    N*t=new N{x,0,0};
-    if(!HD){HD=t;return;}
-    N*p=HD;while(p->next)p=p->next;
-    p->next=t;t->prev=p;
-}
-void IA(int k,int x){
-    N*p=HD;while(p&&p->d!=k)p=p->next;
-    if(!p)return;
-    N*t=new N{x,p->next,p};
-    if(p->next)p->next->prev=t;
-    p->next=t;
-}
-void DD(int k){
-    N*p=HD;while(p&&p->d!=k)p=p->next;
-    if(!p)return;
-    if(p->prev)p->prev->next=p->next;
-    else HD=p->next;
-    if(p->next)p->next->prev=p->prev;
-    delete p;
-}
-void SD(int k){
-    N*p=HD;while(p){if(p->d==k){cout<<"Found\n";return;}p=p->next;}
-    cout<<"Not Found\n";
-}
-void PD(){
-    N*p=HD;while(p){cout<<p->d<<" ";p=p->next;}cout<<"\n";
-}
-
-void IFC(int x){
-    N*t=new N{x,0,0};
-    if(!HC){HC=t;t->next=t;return;}
-    N*p=HC;while(p->next!=HC)p=p->next;
-    t->next=HC;p->next=t;HC=t;
-}
-void ILC(int x){
-    N*t=new N{x,0,0};
-    if(!HC){HC=t;t->next=t;return;}
-    N*p=HC;while(p->next!=HC)p=p->next;
-    p->next=t;t->next=HC;
-}
-void IAC(int k,int x){
-    if(!HC)return;
-    N*p=HC;
-    do{
-        if(p->d==k){
-            N*t=new N{x,p->next,0};
-            p->next=t;return;
-        }
-        p=p->next;
-    }while(p!=HC);
-}
-void DC(int k){
-    if(!HC)return;
-    N*p=HC,*q=0;
-    do{
-        if(p->d==k){
-            if(p==HC){
-                N*l=HC;while(l->next!=HC)l=l->next;
-                if(l==HC){delete HC;HC=0;return;}
-                HC=HC->next;l->next=HC;delete p;return;
-            }
-            q->next=p->next;delete p;return;
-        }
-        q=p;p=p->next;
-    }while(p!=HC);
-}
-void SC(int k){
-    if(!HC){cout<<"Not Found\n";return;}
-    N*p=HC;
-    do{if(p->d==k){cout<<"Found\n";return;}p=p->next;}while(p!=HC);
-    cout<<"Not Found\n";
-}
-void PC(){
-    if(!HC){cout<<"\n";return;}
-    N*p=HC;do{cout<<p->d<<" ";p=p->next;}while(p!=HC);cout<<"\n";
-}
-
-int main(){
-    int c,t,x,k,p;
-    for(;;){
-        cout<<"1 Insert\n2 Delete\n3 Search\n4 Display\n5 Exit\n";
-        cin>>c;if(c==5)break;
-        cout<<"1 Doubly 2 Circular\n";cin>>t;
-        if(c==1){
-            cout<<"1 First 2 Last 3 After\n";cin>>p;
-            cout<<"Value ";cin>>x;
-            if(t==1){
-                if(p==1)IF(x);
-                else if(p==2)IL(x);
-                else{cout<<"Key ";cin>>k;IA(k,x);}
-            }else{
-                if(p==1)IFC(x);
-                else if(p==2)ILC(x);
-                else{cout<<"Key ";cin>>k;IAC(k,x);}
-            }
-        }else if(c==2){
-            cout<<"Key ";cin>>k;
-            if(t==1)DD(k);else DC(k);
-        }else if(c==3){
-            cout<<"Key ";cin>>k;
-            if(t==1)SD(k);else SC(k);
-        }else{
-            if(t==1)PD();else PC();
-        }
+void sel(int a[],int n){
+    for(int i=0;i<n-1;i++){
+        int m=i;
+        for(int j=i+1;j<n;j++) if(a[j]<a[m]) m=j;
+        swap(a[i],a[m]);
     }
 }
 
+void ins(int a[],int n){
+    for(int i=1;i<n;i++){
+        int k=a[i],j=i-1;
+        while(j>=0 && a[j]>k){a[j+1]=a[j];j--;}
+        a[j+1]=k;
+    }
+}
+
+void bub(int a[],int n){
+    for(int i=0;i<n-1;i++)
+        for(int j=0;j<n-i-1;j++)
+            if(a[j]>a[j+1]) swap(a[j],a[j+1]);
+}
+
+void merge(int a[],int l,int m,int r){
+    int n1=m-l+1,n2=r-m,x[50],y[50];
+    for(int i=0;i<n1;i++) x[i]=a[l+i];
+    for(int i=0;i<n2;i++) y[i]=a[m+1+i];
+    int i=0,j=0,k=l;
+    while(i<n1&&j<n2) a[k++]=x[i]<=y[j]?x[i++]:y[j++];
+    while(i<n1) a[k++]=x[i++];
+    while(j<n2) a[k++]=y[j++];
+}
+
+void merges(int a[],int l,int r){
+    if(l<r){
+        int m=(l+r)/2;
+        merges(a,l,m);
+        merges(a,m+1,r);
+        merge(a,l,m,r);
+    }
+}
+
+int part(int a[],int l,int r){
+    int p=a[r],i=l-1;
+    for(int j=l;j<r;j++) if(a[j]<p) swap(a[++i],a[j]);
+    swap(a[i+1],a[r]);
+    return i+1;
+}
+
+void quick(int a[],int l,int r){
+    if(l<r){
+        int p=part(a,l,r);
+        quick(a,l,p-1);
+        quick(a,p+1,r);
+    }
+}
+
+int main(){
+    int n,i,c,a[50];
+    cin>>n;
+    for(i=0;i<n;i++) cin>>a[i];
+    cin>>c;
+    switch(c){
+        case 1: sel(a,n); break;
+        case 2: ins(a,n); break;
+        case 3: bub(a,n); break;
+        case 4: merges(a,0,n-1); break;
+        case 5: quick(a,0,n-1); break;
+    }
+    for(i=0;i<n;i++) cout<<a[i]<<" ";
+}

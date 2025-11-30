@@ -1,27 +1,23 @@
 #include <iostream>
 using namespace std;
 
-struct Node { int data; Node *next; };
-Node *head = 0;
+int main(){
+    int n,a[50];
+    cin>>n;
+    for(int i=0;i<n;i++) cin>>a[i];
 
-void display() {
-    if (!head) return;
-    Node *p = head;
-    do {
-        cout << p->data << " ";
-        p = p->next;
-    } while (p != head);
-    cout << head->data << "\n";
-}
+    int l=0,r=n-1;
+    while(l<r){
+        int mn=l,mx=l;
+        for(int i=l;i<=r;i++){
+            if(a[i]<a[mn]) mn=i;
+            if(a[i]>a[mx]) mx=i;
+        }
+        swap(a[l],a[mn]);
+        if(mx==l) mx=mn;
+        swap(a[r],a[mx]);
+        l++; r--;
+    }
 
-int main() {
-    Node *a=new Node{20,0};
-    Node *b=new Node{100,0};
-    Node *c=new Node{40,0};
-    Node *d=new Node{80,0};
-    Node *e=new Node{60,0};
-    a->next=b; b->next=c; c->next=d; d->next=e; e->next=a;
-    head=a;
-
-    display();
+    for(int i=0;i<n;i++) cout<<a[i]<<" ";
 }
