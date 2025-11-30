@@ -1,22 +1,36 @@
-#include <iostream>
+#include <bits/stdc++.h>
 using namespace std;
 
-struct Node{int d;Node*next;};
+void heapify(vector<int>&a,int n,int i){
+    int l=2*i+1,r=2*i+2,m=i;
+    if(l<n && a[l]>a[m]) m=l;
+    if(r<n && a[r]>a[m]) m=r;
+    if(m!=i){ swap(a[i],a[m]); heapify(a,n,m); }
+}
 
-bool circular(Node* h){
-    if(!h) return false;
-    Node*t=h->next;
-    while(t && t!=h) t=t->next;
-    return t==h;
+void heapsortInc(vector<int>&a){
+    int n=a.size();
+    for(int i=n/2-1;i>=0;i--) heapify(a,n,i);
+    for(int i=n-1;i>0;i--){
+        swap(a[0],a[i]);
+        heapify(a,i,0);
+    }
+}
+
+void heapsortDec(vector<int>&a){
+    heapsortInc(a);
+    reverse(a.begin(),a.end());
 }
 
 int main(){
-    Node*a=new Node{2,0};
-    Node*b=new Node{4,0};
-    Node*c=new Node{6,0};
-    Node*d=new Node{7,0};
-    Node*e=new Node{5,0};
-    a->next=b;b->next=c;c->next=d;d->next=e;e->next=a;
+    int n; cin>>n;
+    vector<int>a(n);
+    for(int i=0;i<n;i++) cin>>a[i];
 
-    cout<<(circular(a)?"True":"False");
+    int ch; cin>>ch;
+
+    if(ch==1) heapsortInc(a);
+    else heapsortDec(a);
+
+    for(int x:a) cout<<x<<" ";
 }
